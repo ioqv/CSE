@@ -56,21 +56,6 @@ print(f(5))
 # If staments
 
 
-def grade_calc(percentage):
-    if percentage >= 90:
-        return "A"
-    elif percentage < 90 and percentage >=80 :
-        return "B"
-    elif percentage >= 70:
-        return"C"
-    elif percentage >= 60:
-        return"D"
-    elif percentage >= 50:
-        return"E"
-     
-
-def grade_calc(percentage):
-    if
 
 
 
