@@ -1,3 +1,14 @@
+def fight(target):
+    while player.health > 0 and target.health > 0:
+        print("You have %d Health left" % player.health)
+        print("%s has %d health left" % (target.name, target.health))
+        print("What do you want to do?")
+        cmd = input(">_")
+
+        if cmd == 'attack':
+            player.attack(target)
+        target.attack(player)
+
 class Item(object):
     def __init__(self, name):
         self.name = name
@@ -84,6 +95,11 @@ class Weapons(Item):
         print("%s attacks a zombie" % self.name)
 
 
+class Hands(Weapons):
+    def __init__(self):
+        super(Hands, self).__init__("Your Hands", 10)
+
+
 class ThunderGun(Weapons):
     def __init__(self, name, attack):
         super(Weapons, self).__init__(name)
@@ -133,8 +149,16 @@ class Character(object):
         self.abilities.append(ability)
 
 
-thunder_Gun = Weapons("Thunder Gun", 100)
-player = Character('Willy', 'Gun', ['Fast_Sprint'], 'Kill', '100', thunder_Gun)
+hands = Hands()
+
+
+class Zombie(Character):
+    def __init__(self):
+        super(Zombie, self).__init__("Zombie", [], [], [], 100, hands)
+
+zombie = Zombie()
+thunder_Gun = Weapons("Thunder Gun", 75)
+player = Character('Willy', 'Gun', ['Fast_Sprint'], 'Kill', 100, thunder_Gun)
 
 
 print(player.name)
@@ -145,7 +169,7 @@ print(player.attack)
 
 
 class Room(object):
-    def __init__(self, name, north, west, south, east, description, ability=None):
+    def __init__(self, name, north, west, south, east, description, ability=None, enemies=None):
         self.name = name
         self.description = description
         self.north = north
@@ -153,6 +177,7 @@ class Room(object):
         self.south = south
         self.east = east
         self.ability = ability
+        self.enemies = enemies
 
     def move(self, direction):
         global current_node
@@ -160,28 +185,29 @@ class Room(object):
 
 
 # Initialize Rooms
-start = Room("Starting Room", 'theater', 'lookout', None, 'fire_pad',
+Start = Room("Start", 'Theater', 'lookout', None, 'Fire_pad',
              'Where you start the teleporter.')
-theater = Room("Theater", 'Projector', 'Trap Room', 'Starting room',
-               'Library', 'Is where you activate the teleporter and take take weapon "MK".')
-fire_pad = Room("Fire_pad", 'Outside', None, None, 'Starting Room',
+Theater = Room("Theater", 'Projector', 'Trap_Room', 'Start',
+               'Library', 'Is where you activate the teleporter and take take weapon "MK".', None, [zombie])
+Fire_pad = Room("Fire_pad", 'Outside', None, None, 'Start',
                 'You could activate a trap.')
 Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None,
                'You could take a perk " Double Tap.', 'double tap')
 Fence_Room = Room("Fence_Room", 'Trap Room', None, 'Outside', 'Theater',
-                  'You can activate a electricity trap.')
+                  'You can activate a electricity trap and take weapon "thunder_gun".', None, [zombie])
 Library = Room("Library", None, 'Theater', 'Living_Room', None,
                'This is where you can flip a lever to make the mystery chest and take weapon "AK47".')
 Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
                    'None', 'You could take a perk "Fast Hands.')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
               'You can drink a perk "Juggernaut.')
-Projector = Room("Projector", None, None, theater, None,
+Projector = Room("Projector", None, None, 'theater', None,
                  'you can pick up a weapon and can activate the movie.')
 Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'You can activate the electricity trap and '
                                                                  'take weapon"AR15".')
+Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, shirt and helmet.')
 
-current_node = start
+current_node = Start
 directions = ['north', 'south', 'east', 'west']
 short_directions = ['n', 's', 'e', 'w']
 
@@ -189,6 +215,10 @@ while True:
 
     print(current_node.name)
     print(current_node.description)
+    if current_node.enemies is not None:
+        for char in current_node.enemies:
+            print("You see a %s" % char.name)
+            fight(char)
     command = input('>_').lower()
     if command == 'quit':
         quit(0)
