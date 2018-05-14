@@ -158,8 +158,8 @@ class Zombie(Character):
 
 zombie = Zombie()
 thunder_Gun = Weapons("Thunder Gun", 75)
-player = Character('Willy', 'Gun', ['Fast_Sprint'], 'Kill', 100, thunder_Gun)
-
+player = Character('Willy', [], ['Fast_Sprint'], 'Kill', 100, thunder_Gun)
+shirt = Shirt("Red Shirt", "cotton")
 
 print(player.name)
 print(player.abilities)
@@ -169,7 +169,7 @@ print(player.attack)
 
 
 class Room(object):
-    def __init__(self, name, north, west, south, east, description, ability=None, enemies=None):
+    def __init__(self, name, north, west, south, east, description, ability=None, enemies=None, items=[]):
         self.name = name
         self.description = description
         self.north = north
@@ -178,6 +178,7 @@ class Room(object):
         self.east = east
         self.ability = ability
         self.enemies = enemies
+        self.items = items
 
     def move(self, direction):
         global current_node
@@ -188,7 +189,8 @@ class Room(object):
 Start = Room("Start", 'Theater', 'lookout', None, 'Fire_pad',
              'Where you start the teleporter.')
 Theater = Room("Theater", 'Projector', 'Trap_Room', 'Start',
-               'Library', 'Is where you activate the teleporter and take take weapon "MK".', None, [zombie])
+               'Library', 'Is where you activate the teleporter and take take weapon "MK".', None, [zombie],
+               [MK("MK", 40)])
 Fire_pad = Room("Fire_pad", 'Outside', None, None, 'Start',
                 'You could activate a trap.')
 Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None,
@@ -201,11 +203,11 @@ Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
                    'None', 'You could take a perk "Fast Hands.')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
               'You can drink a perk "Juggernaut.')
-Projector = Room("Projector", None, None, 'theater', None,
+Projector = Room("Projector", None, 'Dresser', 'theater', None,
                  'you can pick up a weapon and can activate the movie.')
 Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'You can activate the electricity trap and '
-                                                                 'take weapon"AR15".')
-Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, shirt and helmet.')
+                                                                 'take weapon"AR15".', None, None, [AR15("AR15", 50)])
+Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, shirt and helmet.', None, None, [shirt])
 
 current_node = Start
 directions = ['north', 'south', 'east', 'west']
@@ -233,23 +235,24 @@ while True:
         except KeyError:
             print("You cannot go this way")
 
+    elif command == "take ability":
         if current_node.ability is not None:
             player.add_ability(current_node.ability)
             print("you pick up the perk %s" % current_node.ability)
             current_node.ability = None
         else:
             print("There is no perk here")
-        if current_node.ability is not None:
-            player.add_ability(current_node.ability)
+    elif command == "take":
+        item_name = input("Take what? ")
+        found = False
+        if current_node.items is not None:
+            for item in current_node.items:
+                if item_name == item.name:
+                    player.inventory.append(item)
+                    found = True
+        if not found:
+            print("It isn't here")
 
-        if player.weapon is not None:
-            player.add_ability(current_node.ability)
-            print("you pick up weapon %s" % current_node.ability)
-            current_node.ability = None
-        else:
-            print("There is no weapon here")
-        if current_node.ability is not None:
-            player.add_ability(current_node.ability)
 
     else:
         print('Command not Recognized')
