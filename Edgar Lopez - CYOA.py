@@ -203,7 +203,7 @@ Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
                    'None', 'You could take a perk "Fast Hands.')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
               'You can drink a perk "Juggernaut.')
-Projector = Room("Projector", None, 'Dresser', 'theater', None,
+Projector = Room("Projector", None, 'Dresser', 'Theater', None,
                  'you can pick up a weapon and can activate the movie.')
 Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'You can activate the electricity trap and '
                                                                  'take weapon"AR15".', None, None, [AR15("AR15", 50)])
@@ -242,7 +242,6 @@ while True:
             current_node.ability = None
         else:
             print("There is no perk here")
-    elif command == "take":
         item_name = input("Take what? ")
         found = False
         if current_node.items is not None:
@@ -253,7 +252,22 @@ while True:
         if not found:
             print("It isn't here")
 
-
+    elif command == "take weapon":
+        if current_node.ability is not None:
+            player.add_weapon(current_node.weapon)
+            print("you pick up weapon %s" % current_node.weapon)
+            current_node.weapon = None
+        else:
+            print("There is no weapon here")
+        item_name = input("Take what? ")
+        found = False
+        if current_node.items is not None:
+            for item in current_node.items:
+                if item_name == item.name:
+                    player.inventory.append(item)
+                    found = True
+        if not found:
+            print("It isn't here")
     else:
         print('Command not Recognized')
     print()
