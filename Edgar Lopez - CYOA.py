@@ -7,7 +7,7 @@ def fight(target):
 
         if cmd == 'attack':
             player.attack(target)
-        target.attack(player)
+
 
 class Item(object):
     def __init__(self, name):
@@ -136,7 +136,7 @@ class Character(object):
         self.inventory = inventory
         self.abilities = abilities
         self.stats = stats
-        self.health = health
+        self.health = 100
         self.weapon = weapon
 
     def attack(self, enemy):
@@ -203,11 +203,11 @@ Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
                    'None', 'You could take a perk "Fast Hands.')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
               'You can drink a perk "Juggernaut.')
-Projector = Room("Projector", None, 'Dresser', 'theater', None,
+Projector = Room("Projector", None, 'Dresser', 'Theater', None,
                  'you can pick up a weapon and can activate the movie.')
 Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'You can activate the electricity trap and '
                                                                  'take weapon"AR15".', None, None, [AR15("AR15", 50)])
-Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, shirt and helmet.', None, None, [shirt])
+Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, and helmet.', None, None, [shirt])
 
 current_node = Start
 directions = ['north', 'south', 'east', 'west']
@@ -221,6 +221,8 @@ while True:
         for char in current_node.enemies:
             print("You see a %s" % char.name)
             fight(char)
+        current_node.enemies = None
+        continue
     command = input('>_').lower()
     if command == 'quit':
         quit(0)
@@ -248,11 +250,15 @@ while True:
         if current_node.items is not None:
             for item in current_node.items:
                 if item_name == item.name:
+                    print("Taken.")
                     player.inventory.append(item)
                     found = True
         if not found:
             print("It isn't here")
 
+    elif command == 'inventory':
+        for item in player.inventory:
+            print(item.name)
 
     else:
         print('Command not Recognized')
