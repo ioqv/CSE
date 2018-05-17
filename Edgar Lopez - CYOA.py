@@ -7,6 +7,8 @@ def fight(target):
 
         if cmd == 'attack':
             player.attack(target)
+        if target.health > 0:
+            target.attack(player)
 
 
 class Item(object):
@@ -198,7 +200,8 @@ Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None,
 Fence_Room = Room("Fence_Room", 'Trap Room', None, 'Outside', 'Theater',
                   'You can activate a electricity trap and take weapon "thunder_gun".', None, [zombie])
 Library = Room("Library", None, 'Theater', 'Living_Room', None,
-               'This is where you can flip a lever to make the mystery chest and take weapon "AK47".')
+               'This is where you can flip a lever to make the mystery chest and take weapon "AK47".', None, None,
+               [AK47("AK47", 40)])
 Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
                    'None', 'You could take a perk "Fast Hands.')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
@@ -206,7 +209,7 @@ Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
 Projector = Room("Projector", None, 'Dresser', 'Theater', None,
                  'you can pick up a weapon and can activate the movie.')
 Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'You can activate the electricity trap and '
-                                                                 'take weapon"AR15".', None, None, [AR15("AR15", 50)])
+  'take weapon"AR15".', None, None, [AR15("AR15", 50)])
 Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, and helmet.', None, None, [shirt])
 
 current_node = Start
