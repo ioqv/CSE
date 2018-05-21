@@ -1,27 +1,19 @@
 import sys
 
+
 def fight(target):
     while player.health > 0 and target.health > 0:
         print("You have %d Health left" % player.health)
-
         print("%s has %d health left" % (target.name, target.health))
         print("What do you want to do?")
-        cmd = input(">_")
-
-    if player.health <= 0:
-        print("You died")
-        exit(0)
 
         cmd = input(">_")
 
-
-        print("Target has %d Health left" % target.health)
-        cmd = input("What do you want to do? ")
         if cmd == 'attack':
             player.attack(target)
-        if target.health > 0:
+        if target.health >= 0:
             target.attack(player)
-        if player.health <= 0:
+        if player.health < 0:
             print("You died")
             sys.exit(0)
 
@@ -60,7 +52,7 @@ class Jerganaut(Consumable):
         print("You drink %s to take more hits" % self.name)
 
 
-class Doubletap(Consumable):
+class health(Consumable):
     def __init__(self, name, perks):
         super(Consumable, self).__init__(name)
         self.perks = perks
@@ -113,7 +105,7 @@ class Weapons(Item):
 
 class Hands(Weapons):
     def __init__(self):
-        super(Hands, self).__init__("Your Hands", 30)
+        super(Hands, self).__init__("Your Hands", 25)
 
 
 class ThunderGun(Weapons):
@@ -172,9 +164,9 @@ class Zombie(Character):
     def __init__(self):
         super(Zombie, self).__init__("Zombie", [], [], [], 100, hands)
 
+
 zombie = Zombie()
 thunder_Gun = ThunderGun("Thunder Gun", 50)
-
 ar15 = Weapons("AR15", 35)
 mk = MK("MK", 35)
 raygun = RayGun("RayGun", 55)
@@ -211,25 +203,25 @@ class Room(object):
 Start = Room("Start", 'Theater', 'lookout', None, 'Fire_pad',
              'Where you start the teleporter.')
 Theater = Room("Theater", 'Projector', 'Trap_Room', 'Start',
-               'Library', 'You can take weapon "MK".', None, [zombie],
+               'Library', 'You can take weapon "MK".', None, [Zombie()],
                [MK("MK", 35)])
 Fire_pad = Room("Fire_pad", 'Outside', None, None, 'Start',
-                'You can take weapon "AR15".', None, None, [zombie],
-                [AR15("AR15", 35)])
+                'You can take weapon "AR15".', None, [Zombie()],
+                [AR15("AR15", 40)])
 Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None,
-               'You could take a perk " Double Tap.', 'double tap')
+               'You could take a perk "Health".', 'health')
 Fence_Room = Room("Fence_Room", 'Trap Room', None, 'Outside', 'Theater',
-                  'You can take weapon "Thunder_gun".', None, [zombie],
+                  'You can take weapon "Thunder_gun".', None, [Zombie()],
                   [ThunderGun("Thunder_gun", 50)])
 Library = Room("Library", None, 'Theater', 'Living_Room', None,
-               'you can take weapon "AK47".', None, None,
-               [AK47("AK47", 40)])
+               'You can take weapon "MK".', None, [Zombie()],
+               [MK("MK", 40)])
 Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
-                   'None', 'You could take a perk "Fast Hands.')
+                   'None', 'You could take a perk "Fast Hands".')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
               'You can drink a perk "Juggernaut.')
 Projector = Room("Projector", None, 'Dresser', 'Theater', None,
-                 'you can pick up a wearable and take RayGun.', None, None,[RayGun("RayGun", 100)])
+                 'you can pick up a perk "health" and take RayGun.', ["health", 20], None,[RayGun("RayGun", 100)])
 Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'take weapon"AR15".', None, None, [AR15("AR15", 35)])
 Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, and helmet.', None, None, [shirt])
 
@@ -268,6 +260,7 @@ while True:
             player.add_ability(current_node.ability)
             print("you pick up the perk %s" % current_node.ability)
             current_node.ability = None
+
         else:
             print("There is no perk here")
     elif command == "take":
