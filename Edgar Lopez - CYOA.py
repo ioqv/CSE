@@ -5,11 +5,16 @@ def fight(target):
         print("What do you want to do?")
         cmd = input(">_")
 
+    if player.health <= 0:
+        print("You died")
+        exit(0)
+
+        cmd = input(">_")
+
         if cmd == 'attack':
             player.attack(target)
         if target.health > 0:
             target.attack(player)
-
 
 class Item(object):
     def __init__(self, name):
@@ -262,6 +267,7 @@ while True:
     elif command == 'inventory':
         for item in player.inventory:
             print(item.name)
+
 
     else:
         print('Command not Recognized')
