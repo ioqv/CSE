@@ -1,6 +1,9 @@
+import sys
+
 def fight(target):
     while player.health > 0 and target.health > 0:
         print("You have %d Health left" % player.health)
+
         print("%s has %d health left" % (target.name, target.health))
         print("What do you want to do?")
         cmd = input(">_")
@@ -11,10 +14,16 @@ def fight(target):
 
         cmd = input(">_")
 
+
+        print("Target has %d Health left" % target.health)
+        cmd = input("What do you want to do? ")
         if cmd == 'attack':
             player.attack(target)
         if target.health > 0:
             target.attack(player)
+        if player.health <= 0:
+            print("You died")
+            sys.exit(0)
 
 class Item(object):
     def __init__(self, name):
@@ -104,7 +113,7 @@ class Weapons(Item):
 
 class Hands(Weapons):
     def __init__(self):
-        super(Hands, self).__init__("Your Hands", 10)
+        super(Hands, self).__init__("Your Hands", 30)
 
 
 class ThunderGun(Weapons):
@@ -164,7 +173,13 @@ class Zombie(Character):
         super(Zombie, self).__init__("Zombie", [], [], [], 100, hands)
 
 zombie = Zombie()
-thunder_Gun = Weapons("Thunder Gun", 75)
+thunder_Gun = ThunderGun("Thunder Gun", 50)
+
+ar15 = Weapons("AR15", 35)
+mk = MK("MK", 35)
+raygun = RayGun("RayGun", 55)
+ak47 = AK47("AK47", 30)
+
 player = Character('Willy', [], ['Fast_Sprint'], 'Kill', 100, thunder_Gun)
 shirt = Shirt("Red Shirt", "cotton")
 
@@ -196,25 +211,26 @@ class Room(object):
 Start = Room("Start", 'Theater', 'lookout', None, 'Fire_pad',
              'Where you start the teleporter.')
 Theater = Room("Theater", 'Projector', 'Trap_Room', 'Start',
-               'Library', 'Is where you activate the teleporter and take take weapon "MK".', None, [zombie],
-               [MK("MK", 40)])
+               'Library', 'You can take weapon "MK".', None, [zombie],
+               [MK("MK", 35)])
 Fire_pad = Room("Fire_pad", 'Outside', None, None, 'Start',
-                'You could activate a trap.')
+                'You can take weapon "AR15".', None, None, [zombie],
+                [AR15("AR15", 35)])
 Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None,
                'You could take a perk " Double Tap.', 'double tap')
 Fence_Room = Room("Fence_Room", 'Trap Room', None, 'Outside', 'Theater',
-                  'You can activate a electricity trap and take weapon "thunder_gun".', None, [zombie])
+                  'You can take weapon "Thunder_gun".', None, [zombie],
+                  [ThunderGun("Thunder_gun", 50)])
 Library = Room("Library", None, 'Theater', 'Living_Room', None,
-               'This is where you can flip a lever to make the mystery chest and take weapon "AK47".', None, None,
+               'you can take weapon "AK47".', None, None,
                [AK47("AK47", 40)])
 Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
                    'None', 'You could take a perk "Fast Hands.')
 Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
               'You can drink a perk "Juggernaut.')
 Projector = Room("Projector", None, 'Dresser', 'Theater', None,
-                 'you can pick up a weapon and can activate the movie.')
-Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'You can activate the electricity trap and '
-  'take weapon"AR15".', None, None, [AR15("AR15", 50)])
+                 'you can pick up a wearable and take RayGun.', None, None,[RayGun("RayGun", 100)])
+Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'take weapon"AR15".', None, None, [AR15("AR15", 35)])
 Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, and helmet.', None, None, [shirt])
 
 current_node = Start
@@ -229,6 +245,8 @@ while True:
         for char in current_node.enemies:
             print("You see a %s" % char.name)
             fight(char)
+            if player.health <= 0:
+                sys.exit(0)
         current_node.enemies = None
         continue
     command = input('>_').lower()
