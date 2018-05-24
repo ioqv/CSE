@@ -52,10 +52,10 @@ class Jerganaut(Consumable):
         print("You drink %s to take more hits" % self.name)
 
 
-class health(Consumable):
-    def __init__(self, name, perks):
+class Medkit(Consumable):
+    def __init__(self, name, heal):
         super(Consumable, self).__init__(name)
-        self.perks = perks
+        self.heal = heal
 
     def name(self):
         print("You drink %s to fast reload" % self.name)
@@ -105,7 +105,7 @@ class Weapons(Item):
 
 class Hands(Weapons):
     def __init__(self):
-        super(Hands, self).__init__("Your Hands", 25)
+        super(Hands, self).__init__("Your Hands", 20)
 
 
 class ThunderGun(Weapons):
@@ -199,30 +199,31 @@ class Room(object):
         current_node = globals()[getattr(self, direction)]
 
 
+
 # Initialize Rooms
 Start = Room("Start", 'Theater', 'lookout', None, 'Fire_pad',
              'Where you start the teleporter.')
-Theater = Room("Theater", 'Projector', 'Trap_Room', 'Start',
-               'Library', 'You can take weapon "MK".', None, [Zombie()],
-               [MK("MK", 35)])
-Fire_pad = Room("Fire_pad", 'Outside', None, None, 'Start',
-                'You can take weapon "AR15".', None, [Zombie()],
-                [AR15("AR15", 40)])
-Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None,
-               'You could take a perk "Health".', 'health')
-Fence_Room = Room("Fence_Room", 'Trap Room', None, 'Outside', 'Theater',
-                  'You can take weapon "Thunder_gun".', None, [Zombie()],
-                  [ThunderGun("Thunder_gun", 50)])
-Library = Room("Library", None, 'Theater', 'Living_Room', None,
-               'You can take weapon "MK".', None, [Zombie()],
-               [MK("MK", 40)])
-Living_Room = Room("Living_Room", 'Library', None, 'Kodino',
-                   'None', 'You could take a perk "Fast Hands".')
-Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None,
-              'You can drink a perk "Juggernaut.')
+Theater = Room("Theater", 'Projector', 'Trap_Room', 'Start', 'Library', 'You can take weapon "MK".', None, [Zombie()],
+               [mk])
+
+Fire_pad = Room("Fire_pad", 'Outside', None, None, 'Start', 'You can take weapon "AR15".', None, [Zombie()], [ar15])
+
+Outside = Room("Outside", 'Fence_Room', None, 'Fire Pad', None, 'You could take a perk "Health".', None, None,[])
+
+Fence_Room = Room("Fence_Room", 'Trap Room', None, 'Outside', 'Theater', 'You can take weapon "Thunder_gun".', None,
+                  [Zombie()], [ThunderGun])
+Library = Room("Library", None, 'Theater', 'Living_Room', None, 'You can take weapon "MK".', None, [Zombie()],
+               [])
+Living_Room = Room("Living_Room", 'Library', None, 'Kodino', 'None', 'You could take a perk "Fast Hands".', None,
+                   None, [])
+
+Kodino = Room("Kodino", 'Living_Room', 'Look_out Room', None, None, 'You can drink a perk "Juggernaut.')
+
 Projector = Room("Projector", None, 'Dresser', 'Theater', None,
-                 'you can pick up a perk "health" and take RayGun.', ["health", 20], None,[RayGun("RayGun", 100)])
-Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'take weapon"AR15".', None, None, [AR15("AR15", 35)])
+                 'you can pick up a perk "health" and take RayGun.', ["health", 20], None,[raygun])
+
+Trap_Room = Room("Trap_Room", None, None, Fence_Room, 'Theater', 'take weapon"AR15".', None, None, [])
+
 Dresser = Room("Dresser", None, None, None, 'Projector', 'Pick up shirt, pants, and helmet.', None, None, [shirt])
 
 current_node = Start
@@ -230,7 +231,6 @@ directions = ['north', 'south', 'east', 'west']
 short_directions = ['n', 's', 'e', 'w']
 
 while True:
-
     print(current_node.name)
     print(current_node.description)
     if current_node.enemies is not None:
@@ -259,21 +259,24 @@ while True:
         if current_node.ability is not None:
             player.add_ability(current_node.ability)
             print("you pick up the perk %s" % current_node.ability)
-            current_node.ability = None
+            current_node.item = None
 
         else:
             print("There is no perk here")
     elif command == "take":
+        print("The following items are in the room")
+        for item in current_node.items:
+            print(item.name)
         item_name = input("Take what? ")
         found = False
         if current_node.items is not None:
             for item in current_node.items:
-                if item_name == item.name:
+                if item_name.lower() == item.name.lower():
                     print("Taken.")
                     player.inventory.append(item)
                     found = True
-        if not found:
-            print("It isn't here")
+                else:
+                    print("It isn't here")
 
     elif command == 'inventory':
         for item in player.inventory:
